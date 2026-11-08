@@ -1,0 +1,33 @@
+# Local credentials - never commit secrets
+secrets.h
+secrets.local.h
+credentials.h
+.env
+.env.*
+*.pem
+*.key
+
+# Build and IDE output
+*.elf
+*.hex
+*.bin
+*.uf2
+*.map
+*.o
+*.d
+build/
+.cache/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Python inference artifacts
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+runs/
+weights/
+*.pt
+*.onnx
