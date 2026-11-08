@@ -1,0 +1,10 @@
+# Arduino dependencies for the camera/email + OLED sketch
+ESP32 Arduino Core (Espressif)
+esp_camera (included with ESP32 Arduino Core)
+Adafruit GFX Library
+Adafruit SSD1306
+TJpg_Decoder
+ESP Mail Client
+
+# Install from Arduino IDE Library Manager where possible.
+# Exact library versions should be recorded after confirming the baseline sketch compiles.
