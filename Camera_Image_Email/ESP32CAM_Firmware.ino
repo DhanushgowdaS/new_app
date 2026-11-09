@@ -11,6 +11,13 @@
 
 #include <ESP_Mail_Client.h>
 
+#include <string.h>
+#include <time.h>
+#include "esp_heap_caps.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
+
 // =====================================================
 // 1. WIFI CONFIGURATION
 // =====================================================
@@ -24,7 +31,7 @@ const char* WIFI_PASSWORD = "YOUR_PASSWORD";
 
 #define SENDER_EMAIL "SENDER_GMAIL.COM"
 #define SENDER_PASSWORD "YOUR_GOOGLE_APP_PASSWORD"
-#define RECIPIENT_EMAIL "RECIVER_GMAIL.COM"
+#define RECIPIENT_EMAIL "RECIPIENT_GMAIL.COM"
 
 #define SMTP_HOST "smtp.gmail.com"
 #define SMTP_PORT 465
@@ -107,6 +114,10 @@ const char* STREAM_PART =
 SemaphoreHandle_t cameraMutex;
 
 volatile bool emailSending = false;
+
+// Retry Wi-Fi connection periodically if the access point disconnects.
+unsigned long lastWiFiReconnectAttempt = 0;
+const unsigned long WIFI_RECONNECT_INTERVAL = 10000;
 
 portMUX_TYPE statusMux = portMUX_INITIALIZER_UNLOCKED;
 
@@ -1436,8 +1447,20 @@ void loop() {
 
   if (WiFi.status() != WL_CONNECTED) {
 
-    delay(500);
+    // Avoid repeatedly calling reconnect() on every loop iteration.
+    if (millis() - lastWiFiReconnectAttempt >= WIFI_RECONNECT_INTERVAL) {
+      lastWiFiReconnectAttempt = millis();
+      Serial.println("WiFi disconnected. Attempting to reconnect...");
+      WiFi.reconnect();
+      showOLED(
+        "Camera: READY",
+        "WiFi: RECONNECTING",
+        "Please wait...",
+        "ROBOT: OFFLINE"
+      );
+    }
 
+    delay(100);
     return;
   }
 
